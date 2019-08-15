@@ -1,7 +1,7 @@
 # selenium-shutterbug
 
 [![Build Status](https://travis-ci.org/assertthat/selenium-shutterbug.svg?branch=master)](https://travis-ci.org/assertthat/selenium-shutterbug)
-[![Dependency Status](https://www.versioneye.com/user/projects/581e02854304530ab1e52873/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/581e02854304530ab1e52873)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.assertthat/selenium-shutterbug/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.assertthat/selenium-shutterbug)
 
 ## Synopsis
 
@@ -9,9 +9,9 @@ Selenium Shutterbug is a utility library written in Java for making screenshots 
 
 ## Code Example
 
-Screenhot of the page with scrolling (for Chrome to make screenshot of the whole page but not viewport only):
+Screenshot of the page with scrolling (for Chrome to make screenshot of the whole page but not viewport only):
 ```
-Shutterbug.shootPage(driver, ScrollStrategy.BOTH_DIRECTIONS).save("C:\\testing\\screenshots\\");
+Shutterbug.shootPage(driver, ScrollStrategy.WHOLE_PAGE).save("C:\\testing\\screenshots\\");
 ```
 Highlighting, adding titles, text, etc:
 ```
@@ -43,12 +43,26 @@ The project is available in [Maven Central](http://search.maven.org/#search%7Cga
     <groupId>com.assertthat</groupId>
     <artifactId>selenium-shutterbug</artifactId>
     <version>x.x</version>
+    <exclusions>
+        <exclusion>
+	    <groupId>org.seleniumhq.selenium</groupId>
+	    <artifactId>selenium-java</artifactId>
+	</exclusion>
+     </exclusions>
 </dependency>
 ```
 ##### Using Gradle
 
 ```
-compile 'com.assertthat:selenium-shutterbug:x.x'
+compile ('com.assertthat:selenium-shutterbug:x.x') {
+    exclude group: "org.seleniumhq.selenium", name: "selenium-java"
+    }
+```
+
+##### Using SBT
+
+```
+"com.assertthat" % "selenium-shutterbug" % "x.x" exclude("org.seleniumhq.selenium", "selenium-java"),
 ```
 ## Contributing
 

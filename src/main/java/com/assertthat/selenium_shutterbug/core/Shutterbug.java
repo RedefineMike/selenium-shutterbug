@@ -40,7 +40,7 @@ public class Shutterbug {
      */
     public static PageSnapshot shootPage(WebDriver driver, boolean useDevicePixelRatio) {
         Browser browser = new Browser(driver, useDevicePixelRatio);
-        PageSnapshot pageScreenshot = new PageSnapshot(driver);
+        PageSnapshot pageScreenshot = new PageSnapshot(driver,browser.getDevicePixelRatio());
         pageScreenshot.setImage(browser.takeScreenshot());
         return pageScreenshot;
     }
@@ -79,6 +79,20 @@ public class Shutterbug {
      *
      * @param driver WebDriver instance
      * @param scroll ScrollStrategy How you need to scroll
+     * @param  useDevicePixelRatio whether or not take into account device pixel ratio
+     * @return PageSnapshot instance
+     */
+    public static PageSnapshot shootPage(WebDriver driver, ScrollStrategy scroll, boolean useDevicePixelRatio) {
+        return shootPage(driver,scroll,0,useDevicePixelRatio);
+    }
+
+    /**
+     * To be used when screen shooting the page
+     * and need to scroll while making screen shots, either vertically or
+     * horizontally or both directions (Chrome).
+     *
+     * @param driver WebDriver instance
+     * @param scroll ScrollStrategy How you need to scroll
      * @param  scrollTimeout Timeout to wait after scrolling and before taking screen shot
      * @param useDevicePixelRatio whether or not take into account device pixel ratio
      * @return PageSnapshot instance
@@ -86,16 +100,15 @@ public class Shutterbug {
     public static PageSnapshot shootPage(WebDriver driver, ScrollStrategy scroll, int scrollTimeout, boolean useDevicePixelRatio) {
         Browser browser = new Browser(driver, useDevicePixelRatio);
         browser.setScrollTimeout(scrollTimeout);
-        PageSnapshot pageScreenshot = new PageSnapshot(driver);
+
+        PageSnapshot pageScreenshot = new PageSnapshot(driver, browser.getDevicePixelRatio());
         switch (scroll) {
-            case HORIZONTALLY:
-                pageScreenshot.setImage(browser.takeScreenshotScrollHorizontally());
+            case VIEWPORT_ONLY:
+                pageScreenshot.setImage(browser.takeScreenshot());
                 break;
-            case VERTICALLY:
-                pageScreenshot.setImage(browser.takeScreenshotScrollVertically());
-                break;
-            case BOTH_DIRECTIONS:
+            case WHOLE_PAGE:
                 pageScreenshot.setImage(browser.takeScreenshotEntirePage());
+                break;
         }
         return pageScreenshot;
     }
@@ -120,8 +133,8 @@ public class Shutterbug {
      * @return ElementSnapshot instance
      */
     public static ElementSnapshot shootElement(WebDriver driver, WebElement element, boolean useDevicePixelRatio) {
-        Browser browser = new Browser(driver,useDevicePixelRatio);
-        ElementSnapshot elementSnapshot = new ElementSnapshot(driver);
+        Browser browser = new Browser(driver, useDevicePixelRatio);
+        ElementSnapshot elementSnapshot = new ElementSnapshot(driver, browser.getDevicePixelRatio());
         browser.scrollToElement(element);
         elementSnapshot.setImage(browser.takeScreenshot(),browser.getBoundingClientRect(element));
         return elementSnapshot;

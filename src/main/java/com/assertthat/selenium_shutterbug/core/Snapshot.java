@@ -28,6 +28,7 @@ public abstract class Snapshot<T extends Snapshot> {
     protected BufferedImage image;
     protected BufferedImage thumbnailImage;
     protected WebDriver driver;
+    protected Double devicePixelRatio = 1D;
     private String fileName = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss_SSS").format(new Date())
             + "." + EXTENSION.toLowerCase();
     private Path location = Paths.get("./screenshots/");
@@ -68,7 +69,7 @@ public abstract class Snapshot<T extends Snapshot> {
      * @return instance of type Snapshot
      */
     public T withThumbnail(String path, String name, double scale) {
-        File thumbnailFile = new File(path.toString(), name);
+        File thumbnailFile = new File(path, name);
         if(!Files.exists(Paths.get(path))) {
             thumbnailFile.mkdirs();
         }
@@ -76,7 +77,84 @@ public abstract class Snapshot<T extends Snapshot> {
         FileUtil.writeImage(thumbnailImage, EXTENSION, thumbnailFile);
         return self();
     }
+    
+    /**
+     * Generate cropped thumbnail of the original screenshot.
+     * Will save different thumbnails depends on when it was called in the chain.
+     *
+     * @param path to save thumbnail image to
+     * @param name of the resulting image
+     * @param scale to apply
+     * @param cropWidth e.g. 0.2 will leave 20% of the initial width
+     * @param cropHeight e.g. 0.1 will leave 10% of the initial width
+     * @return instance of type Snapshot
+     */
+    public T withCroppedThumbnail(String path, String name, double scale,  double cropWidth, double cropHeight) {
+        File thumbnailFile = getFile(path, name);
+        thumbnailImage=ImageProcessor.cropAndScale(image,scale, cropWidth, cropHeight);
+        FileUtil.writeImage(thumbnailImage, EXTENSION, thumbnailFile);
+        return self();
+    }
 
+    /**
+     * Generate cropped thumbnail of the original screenshot.
+     * Will save different thumbnails depends on when it was called in the chain.
+     *
+     * @param path to save thumbnail image to
+     * @param name of the resulting image
+     * @param scale to apply
+     * @param maxWidth max width in pixels. If set to -1 the actual image width is used
+     * @param maxHeight max height in pixels. If set to -1 the actual image height is used
+     * @return instance of type Snapshot
+     */
+    public T withCroppedThumbnail(String path, String name, double scale,  int maxWidth, int maxHeight) {
+        File thumbnailFile = getFile(path, name);
+        thumbnailImage=ImageProcessor.cropAndScale(image,scale, maxWidth, maxHeight);
+        FileUtil.writeImage(thumbnailImage, EXTENSION, thumbnailFile);
+        return self();
+    }
+
+    /**
+     * Generate file for cropped thumbnail of the original screenshot.
+     *
+     * @param path to save thumbnail image to
+     * @param name of the resulting image
+     * @return instance of type File
+     */
+    private File getFile(String path, String name) {
+        File thumbnailFile = new File(path, name);
+        if (!Files.exists(Paths.get(path))) {
+            thumbnailFile.mkdirs();
+        }
+        return thumbnailFile;
+    }
+
+    /**
+     * Generate cropped thumbnail of the original screenshot.
+     * Will save different thumbnails depends on when it was called in the chain.
+     *
+     * @param scale to apply
+     * @param cropWidth e.g. 0.2 will leave 20% of the initial width
+     * @param cropHeight e.g. 0.1 will leave 10% of the initial width
+     * @return instance of type Snapshot
+     */
+    public T withCroppedThumbnail(double scale, double cropWidth, double cropHeight) {
+        return withCroppedThumbnail(Paths.get(location.toString(), "./thumbnails").toString(), "thumb_" + fileName, scale,cropWidth,cropHeight);
+    }
+    
+    /**
+     * Generate cropped thumbnail of the original screenshot.
+     * Will save different thumbnails depends on when it was called in the chain.
+     *
+     * @param scale to apply
+     * @param maxWidth max width in pixels. If set to -1 the actual image width is used
+     * @param maxHeight max height in pixels. If set to -1 the actual image height is used
+     * @return instance of type Snapshot
+     */
+    public T withCroppedThumbnail(double scale, int maxWidth, int maxHeight) {
+        return withCroppedThumbnail(Paths.get(location.toString(), "./thumbnails").toString(), "thumb_" + fileName, scale, maxWidth,maxHeight);
+    }
+    
     /**
      * Generate a thumbnail of the original screenshot.
      * Will save different thumbnails depends on when it was called in the chain.

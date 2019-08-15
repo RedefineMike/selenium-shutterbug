@@ -9,7 +9,6 @@ import com.assertthat.selenium_shutterbug.utils.image.ImageProcessor;
 import com.assertthat.selenium_shutterbug.utils.web.Coordinates;
 import com.assertthat.selenium_shutterbug.utils.web.ElementOutsideViewportException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.RasterFormatException;
@@ -19,8 +18,9 @@ import java.awt.image.RasterFormatException;
  */
 public class ElementSnapshot extends Snapshot {
 
-    ElementSnapshot(WebDriver driver) {
+    ElementSnapshot(WebDriver driver, Double devicePixelRatio) {
         this.driver = driver;
+        this.devicePixelRatio = devicePixelRatio;
     }
 
     protected void setImage(BufferedImage image, Coordinates coords) {
